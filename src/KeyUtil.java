@@ -1,5 +1,9 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 // ユーザーの操作を受け付けるクラス
 public class KeyUtil implements KeyListener, MouseListener, MouseMotionListener {
@@ -16,6 +20,8 @@ public class KeyUtil implements KeyListener, MouseListener, MouseMotionListener 
 	private boolean keyE = false;
 
 	private boolean keyEConnect = false;
+	private boolean keyF = false;
+	private boolean keyFConnect = false;
 
 	private int defX = Setting.MAIN_W / 2, defY = Setting.MAIN_H / 2;
 
@@ -56,6 +62,7 @@ public class KeyUtil implements KeyListener, MouseListener, MouseMotionListener 
 			case KeyEvent.VK_E -> keyE = set;
 			case KeyEvent.VK_SPACE -> keySP = set;
 			case KeyEvent.VK_CONTROL -> keyCTRL = set;
+			case KeyEvent.VK_F -> keyF = set;
 
 			case KeyEvent.VK_Q -> System.exit(0);
 		}
@@ -132,6 +139,14 @@ public class KeyUtil implements KeyListener, MouseListener, MouseMotionListener 
 		if (keyEConnect && !keyE) {
 			keyEConnect = false;
 		}
+
+		if (keyF && !keyFConnect){
+			keyFConnect = true;
+			generatePNG();
+		}
+		if (keyFConnect && !keyF){
+			keyFConnect = false;
+		}
 	}
 
 	// WASDキーの文字列出力
@@ -203,6 +218,21 @@ public class KeyUtil implements KeyListener, MouseListener, MouseMotionListener 
 			Robot robot = new Robot();
 			robot.mouseMove(defX, defY);
 		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// スクリーンショット
+	private void generatePNG(){
+
+		BufferedImage bufferedImage = Setting.dispImg;
+
+		try {
+			String fileName = String.format("SS_%d.png", System.currentTimeMillis());
+			File file = new File(fileName);
+			ImageIO.write(bufferedImage, "png", file);
+			System.out.printf("スクリーンショットを%sに保存しました。\n", fileName);
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

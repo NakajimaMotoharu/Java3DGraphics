@@ -4,6 +4,8 @@ import java.util.ArrayList;
 public class DisplayMatrix {
 	private ArrayList<Matrix> matrix;
 	private boolean drawLoop;
+	public double dist = 0;
+	public int[] color = new int[]{0, 0, 0};
 
 	// コンストラクタ
 	public DisplayMatrix(boolean loop){

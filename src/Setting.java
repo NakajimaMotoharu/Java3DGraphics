@@ -1,3 +1,4 @@
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,7 +17,6 @@ public class Setting {
 	public static final String MAIN_TITLE = "MainWindow";
 	public static final String SUB_TITLE = "SubWindow";
 	public static final String SUB_BUTTON_EXIT_TITLE = "Exit";
-	public static final int TARGET_FPS = 60;
 	public static boolean SUB_WINDOW = true;
 
 	public static MainWindow mainWindow;
@@ -27,6 +27,16 @@ public class Setting {
 	public static KeyUtil keyUtil = new KeyUtil();
 	public static double theta = 180, angle = 0;
 	public static double x = 0, y = 8, z = 20;
+	public static long mainCtrlThreadLastTime = -1;
+	public static long mainCtrlThreadFirstTime = -1;
+
+	public static int[][][] display = new int[MAIN_H][MAIN_W][3];
+	public static BufferedImage dispImg = new BufferedImage(MAIN_W, MAIN_H, BufferedImage.TYPE_INT_RGB);
+	public static int[] defColor = new int[]{255, 0, 0};
+	public static int[] ambientColor = new int[]{0, 0, 255};
+	public static double ambientPow = 0.2;
+	public static double[] lightVector = new double[]{-0.57735026919, 0.57735026919, 0.57735026919};
+	public static double lightArc = 0;
 
 	public static double fps = 0;
 	public static int frameCount = 0;
@@ -78,7 +88,7 @@ public class Setting {
 				}
 			}
 		}
-
+		display = new int[MAIN_H][MAIN_H][3];
 		System.out.print("設定ファイルの読み込み完了\n");
 	}
 }

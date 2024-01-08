@@ -1,6 +1,7 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.stream.IntStream;
 
 // 行列変換などを行うクラス
 public class CalcMatrix {
@@ -117,6 +118,65 @@ public class CalcMatrix {
 		return ans;
 	}
 
+	// 画面出力用BufferedImageのインスタンスを生成
+	public static BufferedImage generateDisplayImage(){
+		BufferedImage img = new BufferedImage(Setting.MAIN_W, Setting.MAIN_H, BufferedImage.TYPE_INT_RGB);
+		double[][] depth = new double[Setting.MAIN_H][Setting.MAIN_W];
+		ArrayList<DisplayMatrix>dm = Setting.displayMatrix;
+
+		// depthを最遠点に初期化
+		for (double[] doubles : depth) {
+			Arrays.fill(doubles, Double.MAX_VALUE);
+		}
+
+		for (int i = 0; i < dm.size(); i = i + 1){
+			DisplayMatrix df = dm.get(i);
+			generateFillPolygon(img, df, depth);
+		}
+
+		return img;
+	}
+
+	// 2次元上の面をBufferedImageに書き込み
+	public static void generateFillPolygon(BufferedImage img, DisplayMatrix displayMatrix, double[][] depth){
+		int size = displayMatrix.getSize();
+		int[] color = displayMatrix.color;
+
+		int[] xps = new int[size];
+		int[] yps = new int[size];
+		int xMax, xMin, yMax, yMin;
+		double dist = displayMatrix.dist;
+
+		// Polygon生成
+		for (int i = 0; i < size; i = i + 1){
+			double[] tmp = displayMatrix.getData(i);
+			xps[i] = moveX(tmp[0]);
+			yps[i] = moveY(tmp[1]);
+		}
+		Polygon polygon = new Polygon(xps, yps, size);
+
+		// x, yの最大値・最小値取得
+		xMax = normalization(IntStream.of(xps).max().getAsInt(), Setting.MAIN_W - 1, 0);
+		xMin = normalization(IntStream.of(xps).min().getAsInt(), Setting.MAIN_W - 1, 0);
+		yMax = normalization(IntStream.of(yps).max().getAsInt(), Setting.MAIN_H - 1, 0);
+		yMin = normalization(IntStream.of(yps).min().getAsInt(), Setting.MAIN_H - 1, 0);
+
+		// 描画
+		for (int x = xMin; x <= xMax; x = x + 1){
+			for (int y = yMin; y <= yMax; y = y + 1){
+				if (polygon.contains(x, y) && depth[y][x] >= dist){
+					depth[y][x] = dist;
+					setImgColor(img, x, y, color);
+				}
+			}
+		}
+	}
+
+	// 値を丸める為のメソッド
+	private static int normalization(int n, int max, int min){
+		return Integer.max(Integer.min(n, max), min);
+	}
+
 	// 現在のWorldMatrixからスクリーン情報を生成(射影変換)
 	public static ArrayList<DisplayMatrix> generateDisplayMatrix(){
 		ArrayList<WorldMatrix> wm = transWorldMatrix();
@@ -128,12 +188,17 @@ public class CalcMatrix {
 				double[] tmp = wm.get(i).getData(j);
 				dt.add(1 * tmp[0] / tmp[2], 1 * tmp[1] / tmp[2]);
 			}
+			dt.dist = wm.get(i).dist;
+			dt.color = wm.get(i).color;
 			dm.add(dt);
 		}
 
 		ArrayList<DisplayMatrix>trans = new ArrayList<>();
 		for (int i = 0; i < dm.size(); i = i + 1){
-			trans.add(zoom(4, 4, dm.get(i)));
+			DisplayMatrix tmp = zoom(4, 4, dm.get(i));
+			tmp.dist = dm.get(i).dist;
+			tmp.color = dm.get(i).color;
+			trans.add(tmp);
 		}
 
 		return trans;
@@ -141,7 +206,7 @@ public class CalcMatrix {
 
 	// 現在のWorldMatrixから視野を作成(視野変換)
 	private static ArrayList<WorldMatrix> transWorldMatrix(){
-		ArrayList<WorldMatrix>wm = (ArrayList<WorldMatrix>) Setting.worldMatrices.clone();
+		ArrayList<WorldMatrix>wm = Setting.worldMatrices;
 		boolean[] enb = new boolean[wm.size()];
 		Arrays.fill(enb, true);
 
@@ -165,27 +230,31 @@ public class CalcMatrix {
 		ArrayList<WorldMatrix>enabled = new ArrayList<>();
 		for (int i = 0; i < wm.size(); i = i + 1){
 			if (enb[i]){
-				enabled.add(right2left(wm.get(i)));
+				double tmp = avgDistance(wm.get(i));
+				int[] cl = generateColor(wm.get(i));
+				WorldMatrix adder = right2left(wm.get(i));
+				adder.dist = tmp;
+				adder.color = cl;
+				enabled.add(adder);
 			}
 		}
 		wm = enabled;
 
-		double thetaA = arc2rad(-90);
-		Matrix rz = FormulasMatrix.rotationZ3d(thetaA);
-		double thetaC = arc2rad(-90);
-		Matrix rx = FormulasMatrix.rotationZ3d(thetaC);
+		Matrix rz = FormulasMatrix.rotationZ3d(arc2rad(-180));
 		Matrix view = FormulasMatrix.rotationY3d(arc2rad(Setting.theta));
 		Matrix ang = FormulasMatrix.rotationX3d(arc2rad(Setting.angle));
 		Matrix move = FormulasMatrix.shift3d(Setting.x, Setting.y, Setting.z);
-		Matrix rzryrxt = Matrix.product(rz, Objects.requireNonNull(rx));
 
-		Matrix rot = Matrix.product(move, Objects.requireNonNull(rzryrxt));
+		Matrix rot = Matrix.product(move, Objects.requireNonNull(rz));
 		Matrix agr = Matrix.product(view, Objects.requireNonNull(rot));
 		Matrix fnl = Matrix.product(ang, Objects.requireNonNull(agr));
 
 		ArrayList<WorldMatrix>trans = new ArrayList<>();
 		for (int i = 0; i < wm.size(); i = i + 1){
-			trans.add(trans(wm.get(i), fnl));
+			WorldMatrix tmp = trans(wm.get(i), fnl);
+			tmp.dist = wm.get(i).dist;
+			tmp.color = wm.get(i).color;
+			trans.add(tmp);
 		}
 
 		return trans;
@@ -207,5 +276,154 @@ public class CalcMatrix {
 		}
 
 		return tmp;
+	}
+
+	// WorldMatrixと視点位置の距離の平均を求める
+	public static double avgDistance(WorldMatrix wm){
+		double sum = 0;
+
+		for (int i = 0; i < wm.getSize(); i = i + 1){
+			double[] point = wm.getData(i);
+			double dx = point[0] - Setting.x;
+			double dy = point[1] - Setting.y;
+			double dz = point[2] - Setting.z;
+			sum = sum + Math.sqrt(dx * dx + dy * dy + dz * dz);
+		}
+
+		return sum / wm.getSize();
+	}
+
+	// 実数をディスプレイ上の座標に変換(X)
+	private static int moveX(double x){
+		x = x * 100; // pow
+		x = x + ((double) Setting.MAIN_W / 2);
+		return (int) x;
+	}
+
+	// 実数をディスプレイ上の座標に変換(Y)
+	private static int moveY(double y){
+		y = y * -1;
+		y = y * 100; // pow
+		y = y + ((double) Setting.MAIN_H / 2);
+		return (int) y;
+	}
+
+	private static double removeX(int x) {
+		double result = x - ((double) Setting.MAIN_W / 2);
+		result = result / 100; // pow
+		return result;
+	}
+
+	// 画面上の整数型y座標を実数型y座標に逆変換
+	private static double removeY(int y) {
+		double result = y - ((double) Setting.MAIN_H / 2);
+		result = result / 100; // pow
+		result = result * -1;
+		return result;
+	}
+
+	// 原点と点のなす角(0 <= theta < 360)
+	public static double getTheta(double x, double y){
+		if (x == 0){
+			return 0;
+		}
+
+		double rad = Math.atan(y / x);
+
+		if (x < 0){
+			rad = rad + Math.PI;
+		}
+
+		return rad;
+	}
+
+	// ラジアンを度数表現に変換(任意のradに対して0 <= theta < 360)
+	public static double rad2arc(double r){
+		double arc = (r / Math.PI) * 180;
+
+		while (arc < 0){
+			arc = arc + 360;
+		}
+
+		while (arc >= 360){
+			arc = arc - 360;
+		}
+
+		return arc;
+	}
+
+	// 点pと(点1, 点2)のなす角を求める(0 <= theta < 180)
+	public static double getDiffTheta(double xp, double yp, double x1, double y1, double x2, double y2){
+		double t1 = rad2arc(getTheta(x1 - xp, y1 - yp));
+		double t2 = rad2arc(getTheta(x2 - xp, y2 - yp));
+		double t3 = Double.max(t1, t2);
+		double t4 = Double.min(t1, t2);
+		double t = t3 - t4;
+
+		if (t >= 180) {
+			t = 360 - t;
+		}
+
+		return t;
+	}
+
+	// 光の足し合わせ(0-255)
+	public static int[] addColor(int[] c1, int[] c2){
+		int[] ans = new int[3];
+
+		for (int i = 0; i < 3; i = i + 1){
+			ans[i] = c1[i] + c2[i];
+			if (ans[i] > 255){
+				ans[i] = 255;
+			} else if (ans[i] < 0){
+				ans[i] = 0;
+			}
+		}
+
+		return ans;
+	}
+
+	// 光の倍率設定(0-255)
+	public static int[] mulColor(int[] c, double x){
+		if ((x >= 0) && (x <= 1)) {
+			int[] ans = new int[3];
+
+			for (int i = 0; i < 3; i = i + 1) {
+				ans[i] = (int) (c[i] * x);
+			}
+
+			return ans;
+		} else {
+			return c.clone();
+		}
+	}
+
+	// WorldMatrixからその面の法線ベクトルを計算する
+	public static double[] getNormalVector(WorldMatrix worldMatrix){
+		double[][] points = new double[][]{worldMatrix.getData(0), worldMatrix.getData(1), worldMatrix.getData(2)};
+		double x = (points[1][1] - points[0][1]) * (points[2][2] - points[0][2]) - (points[2][1] - points[0][1]) * (points[1][2] - points[0][2]);
+		double y = (points[1][2] - points[0][2]) * (points[2][0] - points[0][0]) - (points[2][2] - points[0][2]) * (points[1][0] - points[0][0]);
+		double z = (points[1][0] - points[0][0]) * (points[2][1] - points[0][1]) - (points[2][0] - points[0][0]) * (points[1][1] - points[0][1]);
+
+		return new double[]{x, y, z};
+	}
+
+	// WorldMatrixから色を求める
+	public static int[] generateColor(WorldMatrix worldMatrix){
+		double[] wv = getNormalVector(worldMatrix);
+		double[] lv = Setting.lightVector.clone();
+
+		double val = (wv[0] * lv[0] + wv[1] * lv[1] + wv[2] * lv[2]) / (Math.sqrt(wv[0] * wv[0] + wv[1] * wv[1] + wv[2] * wv[2]) * Math.sqrt(lv[0] * lv[0] + lv[1] * lv[1] + lv[2] * lv[2]));
+		double theta = Math.acos(val);
+		if (theta > Math.PI / 2){
+			theta = (theta - (theta - Math.PI / 2));
+		}
+
+		return addColor(mulColor(Setting.ambientColor.clone(), Setting.ambientPow), mulColor(worldMatrix.color, Math.cos(theta)));
+	}
+
+	//
+	private static void setImgColor(BufferedImage img, int x, int y, int[] color){
+		img.setRGB(x, y, (color[0] << 16 | color[1] << 8) | color[2]);
 	}
 }

@@ -42,6 +42,10 @@ public class WorldReader {
 		for (int i = indexSt + 1, j = 0; i < indexEn; i = i + 1){
 			if (data.get(i).equals("next")){
 				j = j + 1;
+
+				// 色ランダム
+				wt.color = new int[]{(int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256)};
+
 				wm.add(wt);
 				wt = new WorldMatrix();
 			} else {
@@ -54,6 +58,10 @@ public class WorldReader {
 				Setting.lineCount = Setting.lineCount + 1;
 			}
 		}
+
+		// 色ランダム
+		wt.color = new int[]{(int) (Math.random() * 256), (int) (Math.random() * 256), (int) (Math.random() * 256)};
+
 		wm.add(wt);
 
 		System.out.println("ワールドデータの読み込み完了");
@@ -107,6 +115,9 @@ public class WorldReader {
 		ArrayList<WorldMatrix>wm = new ArrayList<>();
 		for (int i = 0; i < fData.size(); i = i + 1){
 			WorldMatrix wt = new WorldMatrix();
+
+			wt.color = Setting.defColor.clone();
+
 			for (int j = 0; j < n[i].length; j = j + 1){
 				count = count + 1;
 				wt.add(v[n[i][j] - 1][0] + x, v[n[i][j] - 1][1] + y, v[n[i][j] - 1][2] + z);

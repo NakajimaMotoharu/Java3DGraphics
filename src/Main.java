@@ -4,12 +4,13 @@ public class Main {
 	public static void main(String[] args) {
 		Setting.init();
 
-		Setting.worldMatrices.addAll(WorldReader.readWldFile("world.wld"));
 		Setting.worldMatrices.addAll(WorldReader.readObjFile("teapot.obj", 0, 0, 0));
 		Setting.displayMatrix = CalcMatrix.generateDisplayMatrix();
-		System.out.printf("合計線分数: %d\n", Setting.lineCount);
+		Setting.dispImg = CalcMatrix.generateDisplayImage();
+		System.out.printf("合計面数: %d\n", Setting.worldMatrices.size());
 
 		MainCtrlThread mainCtrlThread = new MainCtrlThread();
+		RepaintThread repaintThread = new RepaintThread();
 		FrameRateThread frameRateThread = new FrameRateThread();
 		ActionThread actionThread = new ActionThread();
 		Setting.mainWindow = new MainWindow();
@@ -20,11 +21,13 @@ public class Main {
 		mainCtrlThread.start();
 		frameRateThread.start();
 		actionThread.start();
+		repaintThread.start();
 
 		try {
 			mainCtrlThread.join();
 			frameRateThread.join();
 			actionThread.join();
+			repaintThread.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
