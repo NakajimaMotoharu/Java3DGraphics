@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.ArrayList;
 
 // 2次元上の線・面を扱うクラス
@@ -6,6 +7,8 @@ public class DisplayMatrix {
 	private boolean drawLoop;
 	public double dist = 0;
 	public int[] color = new int[]{0, 0, 0};
+	public Polygon texture = null;
+	public int texNum = 0;
 
 	// コンストラクタ
 	public DisplayMatrix(boolean loop){

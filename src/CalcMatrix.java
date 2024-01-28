@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
-import java.util.stream.IntStream;
 
 // 行列変換などを行うクラス
 public class CalcMatrix {
@@ -118,7 +117,7 @@ public class CalcMatrix {
 		return ans;
 	}
 
-	// 画面出力用BufferedImageのインスタンスを生成
+	// 現在のdisplayMatrixから描画用の画像を生成
 	public static BufferedImage generateDisplayImage(){
 		BufferedImage img = new BufferedImage(Setting.MAIN_W, Setting.MAIN_H, BufferedImage.TYPE_INT_RGB);
 		double[][] depth = new double[Setting.MAIN_H][Setting.MAIN_W];
@@ -131,50 +130,27 @@ public class CalcMatrix {
 
 		for (int i = 0; i < dm.size(); i = i + 1){
 			DisplayMatrix df = dm.get(i);
-			generateFillPolygon(img, df, depth);
+			img = generateFillTexture(img, df, depth);
 		}
 
 		return img;
 	}
 
-	// 2次元上の面をBufferedImageに書き込み
-	public static void generateFillPolygon(BufferedImage img, DisplayMatrix displayMatrix, double[][] depth){
-		int size = displayMatrix.getSize();
-		int[] color = displayMatrix.color;
-
-		int[] xps = new int[size];
-		int[] yps = new int[size];
-		int xMax, xMin, yMax, yMin;
+	// テクスチャマッピングを行うための中間クラス 処理自体はImageCalc担当
+	public static BufferedImage generateFillTexture(BufferedImage img, DisplayMatrix displayMatrix, double[][] depth){
+		int[] xps = new int[3], yps = new int[3];
 		double dist = displayMatrix.dist;
 
 		// Polygon生成
-		for (int i = 0; i < size; i = i + 1){
+		for (int i = 0; i < 3; i = i + 1){
 			double[] tmp = displayMatrix.getData(i);
 			xps[i] = moveX(tmp[0]);
 			yps[i] = moveY(tmp[1]);
 		}
-		Polygon polygon = new Polygon(xps, yps, size);
+		Polygon pol = new Polygon(xps, yps, 3); // nps側が出力側
+		Polygon src = clonePolygon(displayMatrix.texture);
 
-		// x, yの最大値・最小値取得
-		xMax = normalization(IntStream.of(xps).max().getAsInt(), Setting.MAIN_W - 1, 0);
-		xMin = normalization(IntStream.of(xps).min().getAsInt(), Setting.MAIN_W - 1, 0);
-		yMax = normalization(IntStream.of(yps).max().getAsInt(), Setting.MAIN_H - 1, 0);
-		yMin = normalization(IntStream.of(yps).min().getAsInt(), Setting.MAIN_H - 1, 0);
-
-		// 描画
-		for (int x = xMin; x <= xMax; x = x + 1){
-			for (int y = yMin; y <= yMax; y = y + 1){
-				if (polygon.contains(x, y) && depth[y][x] >= dist){
-					depth[y][x] = dist;
-					setImgColor(img, x, y, color);
-				}
-			}
-		}
-	}
-
-	// 値を丸める為のメソッド
-	private static int normalization(int n, int max, int min){
-		return Integer.max(Integer.min(n, max), min);
+		return ImageCalc.movingImageTex(Texture.getTexture(displayMatrix.texNum), img, src, pol, depth, dist, displayMatrix.color.clone());
 	}
 
 	// 現在のWorldMatrixからスクリーン情報を生成(射影変換)
@@ -190,6 +166,8 @@ public class CalcMatrix {
 			}
 			dt.dist = wm.get(i).dist;
 			dt.color = wm.get(i).color;
+			dt.texture = clonePolygon(wm.get(i).texture);
+			dt.texNum = wm.get(i).texNum;
 			dm.add(dt);
 		}
 
@@ -198,6 +176,8 @@ public class CalcMatrix {
 			DisplayMatrix tmp = zoom(4, 4, dm.get(i));
 			tmp.dist = dm.get(i).dist;
 			tmp.color = dm.get(i).color;
+			tmp.texture = clonePolygon(dm.get(i).texture);
+			tmp.texNum = dm.get(i).texNum;
 			trans.add(tmp);
 		}
 
@@ -235,6 +215,8 @@ public class CalcMatrix {
 				WorldMatrix adder = right2left(wm.get(i));
 				adder.dist = tmp;
 				adder.color = cl;
+				adder.texture = clonePolygon(wm.get(i).texture);
+				adder.texNum = wm.get(i).texNum;
 				enabled.add(adder);
 			}
 		}
@@ -254,6 +236,8 @@ public class CalcMatrix {
 			WorldMatrix tmp = trans(wm.get(i), fnl);
 			tmp.dist = wm.get(i).dist;
 			tmp.color = wm.get(i).color;
+			tmp.texture = clonePolygon(wm.get(i).texture);
+			tmp.texNum = wm.get(i).texNum;
 			trans.add(tmp);
 		}
 
@@ -422,8 +406,8 @@ public class CalcMatrix {
 		return addColor(mulColor(Setting.ambientColor.clone(), Setting.ambientPow), mulColor(worldMatrix.color, Math.cos(theta)));
 	}
 
-	//
-	private static void setImgColor(BufferedImage img, int x, int y, int[] color){
-		img.setRGB(x, y, (color[0] << 16 | color[1] << 8) | color[2]);
+	// Polygonのクローンを作成
+	private static Polygon clonePolygon(Polygon p){
+		return new Polygon(p.xpoints.clone(), p.ypoints.clone(), p.npoints);
 	}
 }

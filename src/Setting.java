@@ -32,10 +32,10 @@ public class Setting {
 
 	public static int[][][] display = new int[MAIN_H][MAIN_W][3];
 	public static BufferedImage dispImg = new BufferedImage(MAIN_W, MAIN_H, BufferedImage.TYPE_INT_RGB);
-	public static int[] defColor = new int[]{255, 0, 0};
+	public static int[] defColor = new int[]{255, 255, 255};
 	public static int[] ambientColor = new int[]{0, 0, 255};
 	public static double ambientPow = 0.2;
-	public static double[] lightVector = new double[]{-0.57735026919, 0.57735026919, 0.57735026919};
+	public static double[] lightVector = new double[]{0.57735026919, 0.57735026919, -0.57735026919};
 	public static double lightArc = 0;
 
 	public static double fps = 0;

@@ -4,18 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="eb1c656f-1e73-41da-94e7-94c0c6a9044e" name="変更" comment="[upload]">
-      <change afterPath="$PROJECT_DIR$/src/RepaintThread.java" afterDir="false" />
+    <list default="true" id="eb1c656f-1e73-41da-94e7-94c0c6a9044e" name="変更" comment="[update] 2024/01/08 課題2用にアップデート">
+      <change afterPath="$PROJECT_DIR$/src/ImageCalc.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Texture.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CalcMatrix.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CalcMatrix.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/DisplayMatrix.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/DisplayMatrix.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/KeyUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/KeyUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainCtrlThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainCtrlThread.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/MainDraw.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/MainDraw.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/RepaintThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/RepaintThread.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Setting.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Setting.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WorldMatrix.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WorldMatrix.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/WorldReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/WorldReader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/teapot.obj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/world.wld" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,6 +37,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -43,27 +51,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true",
-    "アプリケーション.Main.executor": "Run"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
+    &quot;アプリケーション.Main.executor&quot;: &quot;Run&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
         <option value="jdk-21.0.1-corretto-21.0.1-3183f394aec4-3b9d21dd" />
+        <option value="jdk-21.0.2-corretto-21.0.2-f644763e9732-54352fe9" />
       </set>
     </attachedChunks>
   </component>
@@ -78,7 +87,8 @@
       <workItem from="1701708246691" duration="16000" />
       <workItem from="1701708287866" duration="15000" />
       <workItem from="1701708340641" duration="1159000" />
-      <workItem from="1704714123651" duration="599000" />
+      <workItem from="1704714123651" duration="867000" />
+      <workItem from="1706407821498" duration="1135000" />
     </task>
     <task id="LOCAL-00001" summary="[upload]">
       <option name="closed" value="true" />
@@ -88,7 +98,15 @@
       <option name="project" value="LOCAL" />
       <updated>1701708900061</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="[update] 2024/01/08 課題2用にアップデート">
+      <option name="closed" value="true" />
+      <created>1704714773985</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1704714773985</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -97,6 +115,7 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="[upload]" />
-    <option name="LAST_COMMIT_MESSAGE" value="[upload]" />
+    <MESSAGE value="[update] 2024/01/08 課題2用にアップデート" />
+    <option name="LAST_COMMIT_MESSAGE" value="[update] 2024/01/08 課題2用にアップデート" />
   </component>
 </project>

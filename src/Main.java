@@ -4,7 +4,7 @@ public class Main {
 	public static void main(String[] args) {
 		Setting.init();
 
-		Setting.worldMatrices.addAll(WorldReader.readObjFile("teapot.obj", 0, 0, 0));
+		Setting.worldMatrices.addAll(WorldReader.readObjFile("xxx.obj", 0, 0, 0));
 		Setting.displayMatrix = CalcMatrix.generateDisplayMatrix();
 		Setting.dispImg = CalcMatrix.generateDisplayImage();
 		System.out.printf("合計面数: %d\n", Setting.worldMatrices.size());

@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.ArrayList;
 
 // 3時限上の線・面を扱うクラス
@@ -5,6 +6,8 @@ public class WorldMatrix {
 	private ArrayList<Matrix> matrix;
 	public double dist = 0;
 	public int[] color = Setting.defColor.clone();
+	public Polygon texture = null;
+	public int texNum = 0;
 
 	// コンストラクタ
 	public WorldMatrix(){

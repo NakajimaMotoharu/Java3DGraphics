@@ -8,7 +8,6 @@ public class MainDraw extends JPanel {
 	// メイン描画メソッド
 	@Override
 	protected void paintComponent(Graphics g) {
-		// timer(t1, t2, t3)
 		long t1 = System.currentTimeMillis();
 		paintDisplay(g);
 		g.setColor(Color.GREEN);
@@ -25,7 +24,6 @@ public class MainDraw extends JPanel {
 
 	// Setting.displayを描画
 	private static void paintDisplay(Graphics g){
-		/* Settingに保存されているdispImgを直接描画 ほぼノータイム */
 		g.drawImage(Setting.dispImg, 0, 0, null);
 	}
 }
